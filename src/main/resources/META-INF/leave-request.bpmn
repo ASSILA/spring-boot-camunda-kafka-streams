@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_06z1gni" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.6.0">
+  <bpmn:process id="leave-request" name="User Leave Request" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_LeaveRequest_Placed" name="leave request placed">
+      <bpmn:outgoing>Flow_0zlynwb</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_0zlynwb" sourceRef="StartEvent_LeaveRequest_Placed" targetRef="ServiceTask_Retrieve_Manager_Identifier" />
+    <bpmn:serviceTask id="ServiceTask_Retrieve_Manager_Identifier" name="Retrieve Manager Identifier" camunda:class="com.dhm.camundaspringkafka.adapter.RetrieveManagerAdapter">
+      <bpmn:incoming>Flow_0zlynwb</bpmn:incoming>
+      <bpmn:outgoing>Flow_0crg75j</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_0crg75j" sourceRef="ServiceTask_Retrieve_Manager_Identifier" targetRef="ServiceTask_Send_Leave_Request" />
+    <bpmn:sequenceFlow id="Flow_0a556ad" sourceRef="ServiceTask_Send_Leave_Request" targetRef="ReceiveTask_Validate_Leave_Request" />
+    <bpmn:serviceTask id="ServiceTask_Send_Leave_Request" name="Send Leave Request" camunda:class="com.dhm.camundaspringkafka.adapter.SendLeaveRequestAdapter">
+      <bpmn:incoming>Flow_0crg75j</bpmn:incoming>
+      <bpmn:outgoing>Flow_0a556ad</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:receiveTask id="ReceiveTask_Validate_Leave_Request" name="Wait for Validate Leave Request" messageRef="Message_0j551qy">
+      <bpmn:incoming>Flow_0a556ad</bpmn:incoming>
+      <bpmn:outgoing>Flow_0jc2nqb</bpmn:outgoing>
+    </bpmn:receiveTask>
+    <bpmn:endEvent id="EndEvent_19ml551" name="leave request validated">
+      <bpmn:incoming>Flow_0yp851q</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0jc2nqb" sourceRef="ReceiveTask_Validate_Leave_Request" targetRef="Event_125ehk8" />
+    <bpmn:intermediateCatchEvent id="Event_125ehk8" name="Wait 5 minutes">
+      <bpmn:incoming>Flow_0jc2nqb</bpmn:incoming>
+      <bpmn:outgoing>Flow_0yp851q</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="TimerEventDefinition_1skl0go">
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT5M</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:sequenceFlow id="Flow_0yp851q" sourceRef="Event_125ehk8" targetRef="EndEvent_19ml551" />
+    <bpmn:textAnnotation id="TextAnnotation_1a9xmd0">
+      <bpmn:text>REST</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_1e40tq0" sourceRef="StartEvent_LeaveRequest_Placed" targetRef="TextAnnotation_1a9xmd0" />
+    <bpmn:textAnnotation id="TextAnnotation_0zw9uov">
+      <bpmn:text>REST</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_0qmiffq" sourceRef="ServiceTask_Retrieve_Manager_Identifier" targetRef="TextAnnotation_0zw9uov" />
+    <bpmn:textAnnotation id="TextAnnotation_036q0p7">
+      <bpmn:text>KAFKA</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_16ptnkx" sourceRef="ServiceTask_Send_Leave_Request" targetRef="TextAnnotation_036q0p7" />
+    <bpmn:textAnnotation id="TextAnnotation_09kdcf5">
+      <bpmn:text>KAFKA</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_1c54ik8" sourceRef="ReceiveTask_Validate_Leave_Request" targetRef="TextAnnotation_09kdcf5" />
+  </bpmn:process>
+  <bpmn:message id="Message_0j551qy" name="Message_Validation_From_Manager" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="leave-request">
+      <bpmndi:BPMNShape id="TextAnnotation_1a9xmd0_di" bpmnElement="TextAnnotation_1a9xmd0">
+        <dc:Bounds x="170" y="70" width="100" height="30" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_0zw9uov_di" bpmnElement="TextAnnotation_0zw9uov">
+        <dc:Bounds x="300" y="50" width="100" height="30" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_036q0p7_di" bpmnElement="TextAnnotation_036q0p7">
+        <dc:Bounds x="470" y="50" width="100" height="30" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="TextAnnotation_09kdcf5_di" bpmnElement="TextAnnotation_09kdcf5">
+        <dc:Bounds x="650" y="50" width="100" height="30" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0zlynwb_di" bpmnElement="Flow_0zlynwb">
+        <di:waypoint x="215" y="177" />
+        <di:waypoint x="280" y="177" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0crg75j_di" bpmnElement="Flow_0crg75j">
+        <di:waypoint x="380" y="177" />
+        <di:waypoint x="450" y="177" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0a556ad_di" bpmnElement="Flow_0a556ad">
+        <di:waypoint x="550" y="177" />
+        <di:waypoint x="610" y="177" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0jc2nqb_di" bpmnElement="Flow_0jc2nqb">
+        <di:waypoint x="710" y="177" />
+        <di:waypoint x="742" y="177" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0yp851q_di" bpmnElement="Flow_0yp851q">
+        <di:waypoint x="778" y="177" />
+        <di:waypoint x="812" y="177" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_LeaveRequest_Placed">
+        <dc:Bounds x="179" y="159" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="164" y="202" width="67" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1osfkwt_di" bpmnElement="ServiceTask_Retrieve_Manager_Identifier">
+        <dc:Bounds x="280" y="137" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_08gjjm6_di" bpmnElement="ServiceTask_Send_Leave_Request">
+        <dc:Bounds x="450" y="137" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0tzeygm_di" bpmnElement="ReceiveTask_Validate_Leave_Request">
+        <dc:Bounds x="610" y="137" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_19ml551_di" bpmnElement="EndEvent_19ml551">
+        <dc:Bounds x="812" y="159" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="798" y="202" width="67" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_125ehk8_di" bpmnElement="Event_125ehk8">
+        <dc:Bounds x="742" y="159" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="723" y="199" width="73" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_1e40tq0_di" bpmnElement="Association_1e40tq0">
+        <di:waypoint x="201" y="160" />
+        <di:waypoint x="216" y="100" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Association_0qmiffq_di" bpmnElement="Association_0qmiffq">
+        <di:waypoint x="337" y="137" />
+        <di:waypoint x="347" y="80" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Association_16ptnkx_di" bpmnElement="Association_16ptnkx">
+        <di:waypoint x="507" y="137" />
+        <di:waypoint x="517" y="80" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Association_1c54ik8_di" bpmnElement="Association_1c54ik8">
+        <di:waypoint x="674" y="137" />
+        <di:waypoint x="695" y="80" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
